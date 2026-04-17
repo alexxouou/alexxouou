@@ -55,6 +55,13 @@ const BLOG_POSTS: BlogPost[] = [
 
 // --- Components ---
 
+const openKlaviyoForm = () => {
+  // @ts-ignore
+  const klOnsite = window._klOnsite || [];
+  // @ts-ignore
+  klOnsite.push(['openForm', 'YwypUG']);
+};
+
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -72,6 +79,7 @@ const Navbar = () => {
     { label: 'Chaussures', href: '#shoes' },
     { label: 'Rendez-vous', href: '#appointment' },
     { label: 'Journal', href: '#journal' },
+    { label: 'Newsletter', href: '#newsletter' },
     { label: 'Contact', href: '#contact' },
   ];
 
@@ -441,6 +449,26 @@ const Journal = () => {
   );
 };
 
+const Newsletter = () => {
+  return (
+    <section id="newsletter" className="section-padding bg-black text-white border-t border-white/10">
+      <div className="max-w-3xl mx-auto text-center">
+        <span className="text-white/40 text-xs uppercase tracking-[0.3em] mb-4 block">Le Club Étoile</span>
+        <h2 className="text-4xl md:text-5xl font-serif mb-8 text-white">Rejoignez <span className="italic">l'Excellence</span></h2>
+        <p className="text-white/60 font-light leading-relaxed text-lg mb-12">
+          Inscrivez-vous pour recevoir nos invitations exclusives, nos nouvelles collections et les coulisses de notre atelier.
+        </p>
+        <button 
+          onClick={openKlaviyoForm}
+          className="px-12 py-4 bg-white text-black text-xs uppercase tracking-widest hover:bg-white/80 transition-all duration-500"
+        >
+          S'inscrire
+        </button>
+      </div>
+    </section>
+  );
+};
+
 const Footer = () => {
   return (
     <footer id="contact" className="bg-black text-white section-padding pb-12">
@@ -536,6 +564,7 @@ export default function App() {
       />
       <Appointment />
       <Journal />
+      <Newsletter />
       <Footer />
     </main>
   );
