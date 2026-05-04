@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence, useScroll, useTransform } from 'motion/react';
 import { 
   Instagram, 
   Search, 
@@ -15,8 +15,11 @@ import {
   Phone,
   Menu,
   X,
-  ArrowRight
+  ArrowRight,
+  Star,
+  Plus
 } from 'lucide-react';
+import { IMAGE_IDS, GOOGLE_DRIVE_BASE_URL } from './constants/images';
 
 // --- Types ---
 interface CollectionItem {
@@ -35,22 +38,65 @@ interface BlogPost {
   date: string;
 }
 
+interface Review {
+  id: number;
+  name: string;
+  date: string;
+  content: string;
+  rating: number;
+  image?: string;
+}
+
+// --- Constants & Helpers ---
+const getDriveImage = (idOrPath: string) => {
+  // If it's a long ID (Google Drive), return the direct link
+  if (idOrPath.length > 20 && !idOrPath.includes('/')) {
+    return `${GOOGLE_DRIVE_BASE_URL}${idOrPath}`;
+  }
+  // Fallback to local path or placeholder
+  return idOrPath;
+};
+
 // --- Data ---
 const DRESSES: CollectionItem[] = [
-  { id: 1, title: "L'Éclat d'Audrey", film: "Diamants sur canapé", image: "/photo/82255b362eaf01f4bc4747ca1309fd49.jpg", price: "Sur mesure" },
-  { id: 2, title: "La Grâce de Grace", film: "Fenêtre sur cour", image: "/photo/8798907db8422c89cafb456531d061f6.jpg", price: "Sur mesure" },
-  { id: 3, title: "Le Souffle de Marilyn", film: "Sept ans de réflexion", image: "/photo/c4379ef34ef3f5a87a64dd61d04b58e4.jpg", price: "Sur mesure" },
+  { id: 1, title: "L'Éclat d'Audrey", film: "Diamants sur canapé", image: getDriveImage(IMAGE_IDS.DRESS_AUDREY), price: "Sur mesure" },
+  { id: 2, title: "La Grâce de Grace", film: "Fenêtre sur cour", image: getDriveImage(IMAGE_IDS.DRESS_GRACE), price: "Sur mesure" },
+  { id: 3, title: "Le Souffle de Marilyn", film: "Sept ans de réflexion", image: getDriveImage(IMAGE_IDS.DRESS_MARILYN), price: "Sur mesure" },
 ];
 
 const SHOES: CollectionItem[] = [
-  { id: 4, title: "Escarpin Cendrillon", film: "Le Soulier de Verre", image: "/photochaussure/7b907c823619aa1ecb525b70aa991cdc.jpg", price: "1 200 €" },
-  { id: 5, title: "Mule Hollywood", film: "Ève", image: "/photochaussure/084cfdf071d5fb617e3ff702f6cfd89f.jpg", price: "950 €" },
+  { id: 4, title: "Escarpin Cendrillon", film: "Le Soulier de Verre", image: getDriveImage(IMAGE_IDS.SHOE_CINDERELLA), price: "1 200 €" },
+  { id: 5, title: "Mule Hollywood", film: "Ève", image: getDriveImage(IMAGE_IDS.SHOE_HOLLYWOOD), price: "950 €" },
 ];
 
 const BLOG_POSTS: BlogPost[] = [
-  { id: 1, title: "L'art du drapé : Secrets d'ateliers", category: "Artisanat", image: "/photo/ -3.jpg", date: "Mars 2026" },
-  { id: 2, title: "Le mariage au cinéma : 5 robes cultes", category: "Cinéma", image: "/photo/This model wore a trio of dresses for her lemon yellow, Italian summer-inspired wedding.jpg", date: "Février 2026" },
-  { id: 3, title: "Tendances 2026 : Le retour du voile", category: "Tendances", image: "/photo/8798907db8422c89cafb456531d061f6.jpg", date: "Janvier 2026" },
+  { id: 1, title: "L'art du drapé : Secrets d'ateliers", category: "Artisanat", image: getDriveImage(IMAGE_IDS.BLOG_DRAPERY), date: "Mars 2026" },
+  { id: 2, title: "Le mariage au cinéma : 5 robes cultes", category: "Cinéma", image: getDriveImage(IMAGE_IDS.BLOG_CINEMA), date: "Février 2026" },
+  { id: 3, title: "Tendances 2026 : Le retour du voile", category: "Tendances", image: getDriveImage(IMAGE_IDS.BLOG_TRENDS), date: "Janvier 2026" },
+];
+
+const REVIEWS: Review[] = [
+  {
+    id: 1,
+    name: "Éléonore de V.",
+    date: "Avril 2026",
+    content: "Une expérience absolument hors du commun. La robe 'L'Éclat d'Audrey' m'a transportée dans un autre temps. L'attention aux détails est tout simplement incomparable.",
+    rating: 5,
+  },
+  {
+    id: 2,
+    name: "Sophie L.",
+    date: "Mars 2026",
+    content: "Le rendez-vous privé était magique. On se sent écoutée et comprise. Ma robe sur mesure est le reflet exact de ce que j'avais imaginé.",
+    rating: 5,
+  },
+  {
+    id: 3,
+    name: "Camille R.",
+    date: "Février 2026",
+    content: "Maison Étoile a su capturer l'élégance que je recherchais. Les souliers sont aussi confortables qu'élégants. Merci à toute l'équipe.",
+    rating: 4,
+  },
 ];
 
 // --- Components ---
@@ -74,29 +120,57 @@ const Navbar = () => {
 
   const navItems = [
     { label: 'Accueil', href: '#home' },
-    { label: 'Héritage', href: '#about' },
     { label: 'Robes', href: '#dresses' },
     { label: 'Chaussures', href: '#shoes' },
     { label: 'Rendez-vous', href: '#appointment' },
-    { label: 'Journal', href: '#journal' },
-    { label: 'Newsletter', href: '#newsletter' },
+    { label: 'Avis', href: '#reviews' },
     { label: 'Contact', href: '#contact' },
   ];
 
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+
   return (
     <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${isScrolled ? 'bg-white/95 backdrop-blur-md py-4 shadow-sm' : 'bg-transparent py-8'}`}>
-      <div className="max-w-7xl mx-auto px-6 md:px-12 flex justify-between items-center">
-        <a href="#home" className="text-2xl md:text-3xl font-serif tracking-widest uppercase text-black">
-          Maison <span className="italic">Étoile</span>
+      <div className="max-w-[1600px] mx-auto px-8 md:px-16 flex justify-between items-center">
+        <a href="#home" className="text-2xl md:text-3xl font-serif tracking-[0.2em] uppercase text-black shrink-0">
+          Maison <span className="italic font-light">Étoile</span>
         </a>
 
-        <div className="hidden lg:flex items-center space-x-8">
-          <Search className="w-4 h-4 text-black/60 cursor-pointer hover:text-black transition-colors mr-4" />
-          {navItems.map((item) => (
-            <a key={item.label} href={item.href} className="nav-link">
-              {item.label}
-            </a>
-          ))}
+        <div className="hidden lg:flex items-center space-x-16">
+          <div className="flex items-center space-x-14">
+            {navItems.map((item) => (
+              <a key={item.label} href={item.href} className="nav-link">
+                {item.label}
+              </a>
+            ))}
+          </div>
+
+          <div className="w-[1px] h-4 bg-black/10" />
+
+          <div className="flex items-center relative h-8">
+            <AnimatePresence>
+              {isSearchOpen && (
+                <motion.input
+                  initial={{ width: 0, opacity: 0 }}
+                  animate={{ width: 220, opacity: 1 }}
+                  exit={{ width: 0, opacity: 0 }}
+                  autoFocus
+                  placeholder="RECHERCHER UNE PIÈCE..."
+                  className="bg-transparent border-b border-black/10 text-[9px] uppercase tracking-[0.2em] outline-none py-1 pr-8 placeholder:text-black/20"
+                />
+              )}
+            </AnimatePresence>
+            <button 
+              onClick={() => setIsSearchOpen(!isSearchOpen)}
+              className={`transition-all duration-700 ease-in-out ${isSearchOpen ? 'absolute right-0' : 'relative'}`}
+            >
+              {isSearchOpen ? (
+                <X className="w-3.5 h-3.5 text-black/40 hover:text-black transition-colors" />
+              ) : (
+                <Search className="w-3.5 h-3.5 text-black/40 hover:text-black transition-colors" />
+              )}
+            </button>
+          </div>
         </div>
 
         <button 
@@ -134,21 +208,25 @@ const Navbar = () => {
 };
 
 const Hero = () => {
+  const { scrollY } = useScroll();
+  const y = useTransform(scrollY, [0, 1000], [0, 200]);
+
   return (
     <section id="home" className="relative h-screen w-full overflow-hidden flex items-center justify-center">
       <motion.div 
         initial={{ scale: 1.1 }}
         animate={{ scale: 1 }}
+        style={{ y }}
         transition={{ duration: 2.5, ease: "easeOut" }}
         className="absolute inset-0 z-0"
       >
         <img 
-          src="/photo/8798907db8422c89cafb456531d061f6.jpg" 
+          src={getDriveImage(IMAGE_IDS.HERO_BG)} 
           alt="Maison Étoile Wedding Dress" 
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover object-[center_35%]"
           referrerPolicy="no-referrer"
         />
-        <div className="absolute inset-0 bg-white/10" />
+        <div className="absolute inset-0 bg-white/40" />
       </motion.div>
 
       <div className="relative z-10 text-center px-6">
@@ -156,7 +234,7 @@ const Hero = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5, duration: 1 }}
-          className="text-white text-xs md:text-sm uppercase tracking-[0.4em] mb-6 drop-shadow-md"
+          className="text-black text-[10px] md:text-xs uppercase tracking-[0.6em] mb-8"
         >
           Haute Couture Nuptiale
         </motion.p>
@@ -164,10 +242,10 @@ const Hero = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.8, duration: 1.2 }}
-          className="text-white text-5xl md:text-7xl lg:text-8xl font-serif mb-12 leading-tight drop-shadow-lg"
+          className="text-black text-6xl md:text-8xl lg:text-9xl font-serif mb-16 leading-[1.1]"
         >
           Entrez dans votre histoire,<br />
-          <span className="italic">portez une icône.</span>
+          <span className="italic font-light">portez une icône.</span>
         </motion.h1>
         <motion.div
           initial={{ opacity: 0 }}
@@ -176,10 +254,10 @@ const Hero = () => {
         >
           <a 
             href="#appointment" 
-            className="inline-flex items-center px-10 py-4 bg-white/90 backdrop-blur-sm text-black text-xs uppercase tracking-widest hover:bg-black hover:text-white transition-all duration-500 group"
+            className="inline-flex items-center px-12 py-5 bg-white text-black text-[10px] uppercase tracking-[0.3em] hover:bg-black hover:text-white transition-all duration-700 ease-in-out group"
           >
             Prendre rendez-vous
-            <ChevronRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            <ChevronRight className="ml-3 w-3.5 h-3.5 group-hover:translate-x-1.5 transition-transform duration-500" />
           </a>
         </motion.div>
       </div>
@@ -190,11 +268,12 @@ const Hero = () => {
         transition={{ delay: 2, duration: 1 }}
         className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center"
       >
-        <div className="w-[1px] h-24 bg-white/50 relative overflow-hidden">
+        <span className="text-[9px] uppercase tracking-[0.4em] text-black/40 mb-4 rotate-180 [writing-mode:vertical-lr]">Découvrir</span>
+        <div className="w-[1px] h-20 bg-black/20 relative overflow-hidden">
           <motion.div 
-            animate={{ y: [0, 96] }}
-            transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
-            className="absolute top-0 left-0 w-full h-12 bg-black"
+            animate={{ y: [0, 80] }}
+            transition={{ repeat: Infinity, duration: 2.5, ease: "easeInOut" }}
+            className="absolute top-0 left-0 w-full h-8 bg-black"
           />
         </div>
       </motion.div>
@@ -203,8 +282,17 @@ const Hero = () => {
 };
 
 const About = () => {
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "end start"]
+  });
+
+  const y1 = useTransform(scrollYProgress, [0, 1], [-50, 50]);
+  const y2 = useTransform(scrollYProgress, [0, 1], [30, -30]);
+
   return (
-    <section id="about" className="section-padding bg-white">
+    <section id="about" ref={ref} className="section-padding bg-white overflow-hidden">
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
         <motion.div 
           initial={{ opacity: 0, x: -50 }}
@@ -213,22 +301,22 @@ const About = () => {
           transition={{ duration: 1 }}
           className="relative"
         >
-          <div className="aspect-[3/4] overflow-hidden">
+          <motion.div style={{ y: y1 }} className="aspect-[3/4] overflow-hidden">
             <img 
-              src="/photo/This model wore a trio of dresses for her lemon yellow, Italian summer-inspired wedding.jpg" 
+              src={getDriveImage(IMAGE_IDS.ABOUT_MAIN)} 
               alt="Atelier Maison Étoile Wedding Dress" 
               className="w-full h-full object-cover"
               referrerPolicy="no-referrer"
             />
-          </div>
-          <div className="absolute -bottom-12 -right-12 w-64 h-80 hidden md:block border-8 border-white overflow-hidden shadow-2xl">
+          </motion.div>
+          <motion.div style={{ y: y2 }} className="absolute -bottom-12 -right-12 w-64 h-80 hidden md:block border-8 border-white overflow-hidden shadow-2xl">
             <img 
-              src="/photo/82255b362eaf01f4bc4747ca1309fd49.jpg" 
+              src={getDriveImage(IMAGE_IDS.ABOUT_DETAIL)} 
               alt="Détails dentelle dorée" 
               className="w-full h-full object-cover"
               referrerPolicy="no-referrer"
             />
-          </div>
+          </motion.div>
         </motion.div>
 
         <motion.div 
@@ -237,28 +325,29 @@ const About = () => {
           viewport={{ once: true }}
           transition={{ duration: 1, delay: 0.2 }}
         >
-          <span className="text-black text-xs uppercase tracking-[0.3em] mb-4 block">Notre Héritage</span>
-          <h2 className="text-4xl md:text-5xl font-serif mb-8 leading-snug">
+          <span className="text-black/40 text-[10px] uppercase tracking-[0.4em] mb-6 block">Notre Héritage</span>
+          <h2 className="text-5xl md:text-6xl font-serif mb-10 leading-tight">
             L'élégance intemporelle <br />
-            <span className="italic">née du septième art.</span>
+            <span className="italic font-light">née du septième art.</span>
           </h2>
-          <div className="space-y-6 text-black/70 font-light leading-relaxed text-lg">
+          <div className="luxury-line"></div>
+          <div className="space-y-8 text-black/60 font-light leading-relaxed text-lg lg:pr-12">
             <p>
               Maison Étoile est née d'une passion dévorante pour l'âge d'or du cinéma et la virtuosité de la haute couture nuptiale. Chaque création est un hommage aux silhouettes qui ont marqué l'histoire, de la sophistication d'Audrey Hepburn à la sensualité de Marilyn Monroe.
             </p>
             <p>
-              Dans notre atelier parisien, le temps semble s'arrêter. Nos artisans façonnent chaque robe à la main, utilisant des soies lyonnaises et des dentelles de Calais aux reflets dorés, pour que chaque mariée se sente l'héroïne de son propre film.
+              Dans notre atelier parisien, le temps semble s'arrêter. Nos artisans façonnent chaque robe à la main, utilisant des soies lyonnaises et des dentelles de Calais pour que chaque mariée se sente l'héroïne de son propre film.
             </p>
           </div>
-          <div className="mt-12 pt-12 border-t border-black/10 flex items-center space-x-8">
+          <div className="mt-16 pt-12 border-t border-black/5 flex items-center space-x-12">
             <div>
-              <p className="text-2xl font-serif text-black">1954</p>
-              <p className="text-[10px] uppercase tracking-widest text-black/50">Fondation</p>
+              <p className="text-3xl font-serif text-black mb-1">1954</p>
+              <p className="text-[10px] uppercase tracking-[0.2em] text-black/40">Fondation</p>
             </div>
-            <div className="w-[1px] h-8 bg-black/10" />
+            <div className="w-[1px] h-12 bg-black/5" />
             <div>
-              <p className="text-2xl font-serif text-black">100%</p>
-              <p className="text-[10px] uppercase tracking-widest text-black/50">Fait main</p>
+              <p className="text-3xl font-serif text-black mb-1">100%</p>
+              <p className="text-[10px] uppercase tracking-[0.2em] text-black/40">Fait main</p>
             </div>
           </div>
         </motion.div>
@@ -269,50 +358,55 @@ const About = () => {
 
 const CollectionSection = ({ title, subtitle, items, id }: { title: string, subtitle: string, items: CollectionItem[], id: string }) => {
   return (
-    <section id={id} className="section-padding bg-white">
+    <section id={id} className="section-padding bg-white border-t border-black/5">
       <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-20">
-          <span className="text-black text-xs uppercase tracking-[0.3em] mb-4 block">{subtitle}</span>
-          <h2 className="text-4xl md:text-5xl font-serif">{title}</h2>
+        <div className="text-center mb-24">
+          <span className="text-black/40 text-[10px] uppercase tracking-[0.5em] mb-6 block">{subtitle}</span>
+          <h2 className="text-5xl md:text-6xl font-serif">{title}</h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-16">
           {items.map((item, index) => (
             <motion.div 
               key={item.id}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: index * 0.2 }}
+              transition={{ duration: 1, delay: index * 0.2 }}
               className="group cursor-pointer"
             >
-              <div className="relative aspect-[4/5] overflow-hidden mb-6">
+              <div className="relative aspect-[4/5] overflow-hidden mb-8 bg-black/5">
                 <img 
                   src={item.image} 
                   alt={item.title} 
-                  className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+                  className="w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105"
                   referrerPolicy="no-referrer"
                 />
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-500" />
-                <div className="absolute bottom-0 left-0 w-full p-6 translate-y-full group-hover:translate-y-0 transition-transform duration-500 bg-white/80 backdrop-blur-sm">
-                  <p className="text-[10px] uppercase tracking-widest text-black mb-1">Inspiré par</p>
-                  <p className="text-sm font-serif italic">{item.film}</p>
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-700" />
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-700">
+                  <div className="px-8 py-4 bg-white/90 backdrop-blur-sm text-[10px] uppercase tracking-[0.3em]">
+                    Détails de la pièce
+                  </div>
+                </div>
+                <div className="absolute bottom-0 left-0 w-full p-8 translate-y-full group-hover:translate-y-0 transition-transform duration-700 bg-white/95 backdrop-blur-md">
+                  <p className="text-[9px] uppercase tracking-[0.4em] text-black/40 mb-2">Inspiré par</p>
+                  <p className="text-base font-serif italic">{item.film}</p>
                 </div>
               </div>
-              <div className="flex justify-between items-end">
+              <div className="flex justify-between items-start">
                 <div>
-                  <h3 className="text-xl font-serif mb-1">{item.title}</h3>
-                  <p className="text-xs uppercase tracking-widest text-black/40">Collection Icônes</p>
+                  <h3 className="text-2xl font-serif mb-2 tracking-tight">{item.title}</h3>
+                  <p className="text-[10px] uppercase tracking-[0.2em] text-black/30">Collection Icônes</p>
                 </div>
-                <p className="text-black font-light tracking-widest text-sm">{item.price}</p>
+                <p className="text-black/60 font-light tracking-[0.1em] text-sm mt-1">{item.price}</p>
               </div>
             </motion.div>
           ))}
         </div>
         
-        <div className="mt-20 text-center">
-          <button className="text-xs uppercase tracking-[0.3em] border-b border-black pb-2 hover:text-black transition-colors">
-            Voir toute la collection
+        <div className="mt-24 text-center">
+          <button className="text-[10px] uppercase tracking-[0.4em] border-b border-black pb-3 hover:text-black/40 hover:border-black/20 transition-all duration-500">
+            Explorer l'univers complet
           </button>
         </div>
       </div>
@@ -332,68 +426,68 @@ const Appointment = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
         >
-          <span className="text-black text-xs uppercase tracking-[0.3em] mb-4 block">Expérience Boutique</span>
-          <h2 className="text-4xl md:text-5xl font-serif mb-8">Un moment <br /><span className="italic">rien qu'à vous.</span></h2>
-          <p className="text-black/70 font-light leading-relaxed text-lg mb-12">
+          <span className="text-black/40 text-[10px] uppercase tracking-[0.4em] mb-6 block">Expérience Boutique</span>
+          <h2 className="text-5xl md:text-6xl font-serif mb-10 leading-tight">Un moment <br /><span className="italic font-light">rien qu'à vous.</span></h2>
+          <p className="text-black/60 font-light leading-relaxed text-lg mb-16 max-w-xl">
             Nous vous accueillons dans notre boudoir privé pour une séance d'essayage personnalisée. Champagne, conseils experts et discrétion absolue pour trouver la pièce qui fera de vous une icône.
           </p>
           
-          <div className="space-y-6">
-            <div className="flex items-start space-x-4">
-              <div className="w-10 h-10 rounded-full bg-black/5 flex items-center justify-center flex-shrink-0">
-                <Calendar className="w-4 h-4 text-black" />
+          <div className="space-y-10">
+            <div className="flex items-start space-x-6">
+              <div className="w-12 h-12 border border-black/5 flex items-center justify-center flex-shrink-0">
+                <Calendar className="w-4 h-4 text-black/60" />
               </div>
               <div>
-                <h4 className="font-serif text-lg">Conseil Privé</h4>
-                <p className="text-sm text-black/50">1h30 d'accompagnement exclusif avec notre styliste.</p>
+                <h4 className="font-serif text-xl mb-1 tracking-tight">Conseil Privé</h4>
+                <p className="text-xs text-black/40 uppercase tracking-widest">1h30 d'accompagnement exclusif</p>
               </div>
             </div>
-            <div className="flex items-start space-x-4">
-              <div className="w-10 h-10 rounded-full bg-black/5 flex items-center justify-center flex-shrink-0">
-                <MapPin className="w-4 h-4 text-black" />
+            <div className="flex items-start space-x-6">
+              <div className="w-12 h-12 border border-black/5 flex items-center justify-center flex-shrink-0">
+                <MapPin className="w-4 h-4 text-black/60" />
               </div>
               <div>
-                <h4 className="font-serif text-lg">Atelier Parisien</h4>
-                <p className="text-sm text-black/50">22 Rue du Faubourg Saint-Honoré, 75008 Paris.</p>
+                <h4 className="font-serif text-xl mb-1 tracking-tight">Atelier Parisien</h4>
+                <p className="text-xs text-black/40 uppercase tracking-widest">22 Rue du Faubourg Saint-Honoré</p>
               </div>
             </div>
           </div>
         </motion.div>
 
         <motion.div 
-          initial={{ opacity: 0, scale: 0.95 }}
+          initial={{ opacity: 0, scale: 0.98 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
-          className="bg-white p-10 shadow-xl border border-black/10"
+          className="bg-white p-12 lg:p-16 border border-black/5 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.05)]"
         >
-          <div className="flex justify-between items-center mb-8">
-            <h3 className="font-serif text-2xl">Avril 2026</h3>
-            <div className="flex space-x-4">
-              <button className="p-2 hover:text-black transition-colors"><ChevronRight className="w-4 h-4 rotate-180" /></button>
-              <button className="p-2 hover:text-black transition-colors"><ChevronRight className="w-4 h-4" /></button>
+          <div className="flex justify-between items-center mb-12">
+            <h3 className="font-serif text-2xl tracking-tight">Avril 2026</h3>
+            <div className="flex space-x-2">
+              <button className="p-3 border border-black/5 hover:bg-black hover:text-white transition-all duration-500"><ChevronRight className="w-3.5 h-3.5 rotate-180" /></button>
+              <button className="p-3 border border-black/5 hover:bg-black hover:text-white transition-all duration-500"><ChevronRight className="w-3.5 h-3.5" /></button>
             </div>
           </div>
 
-          <div className="grid grid-cols-6 gap-4 mb-8">
+          <div className="grid grid-cols-6 gap-6 mb-12">
             {days.map(day => (
-              <div key={day} className="text-center text-[10px] uppercase tracking-widest text-black/40 font-bold">{day}</div>
+              <div key={day} className="text-center text-[9px] uppercase tracking-[0.2em] text-black/30 font-medium">{day}</div>
             ))}
             {dates.slice(0, 24).map(date => (
               <button 
                 key={date} 
-                className={`aspect-square flex items-center justify-center text-sm transition-all duration-300
-                  ${date === 14 ? 'bg-black text-white shadow-lg' : 'hover:bg-white hover:text-black'}`}
+                className={`aspect-square flex items-center justify-center text-xs tracking-widest transition-all duration-500
+                  ${date === 14 ? 'bg-black text-white' : 'hover:bg-black/5'}`}
               >
                 {date}
               </button>
             ))}
           </div>
 
-          <button className="w-full py-4 bg-black text-white text-xs uppercase tracking-widest hover:bg-black/80 transition-colors duration-500">
+          <button className="w-full py-5 bg-black text-white text-[10px] uppercase tracking-[0.4em] hover:bg-black/80 transition-all duration-700 ease-in-out">
             Confirmer la date
           </button>
-          <p className="text-center text-[10px] text-black/30 mt-4 uppercase tracking-tighter">
-            * Un acompte de 50€ est requis pour valider votre créneau.
+          <p className="text-center text-[9px] text-black/30 mt-6 uppercase tracking-[0.1em]">
+            * Un acompte est requis pour valider votre créneau.
           </p>
         </motion.div>
       </div>
@@ -403,43 +497,43 @@ const Appointment = () => {
 
 const Journal = () => {
   return (
-    <section id="journal" className="section-padding bg-white">
+    <section id="journal" className="section-padding bg-white border-t border-black/5">
       <div className="max-w-7xl mx-auto">
-        <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
+        <div className="flex flex-col md:flex-row justify-between items-end mb-24 gap-8">
           <div>
-            <span className="text-black text-xs uppercase tracking-[0.3em] mb-4 block">Le Journal</span>
-            <h2 className="text-4xl md:text-5xl font-serif">Inspirations & <span className="italic">Histoires</span></h2>
+            <span className="text-black/40 text-[10px] uppercase tracking-[0.5em] mb-6 block">Le Journal</span>
+            <h2 className="text-5xl md:text-6xl font-serif">Inspirations & <span className="italic font-light">Histoires</span></h2>
           </div>
-          <button className="text-xs uppercase tracking-[0.3em] group flex items-center">
-            Tout lire <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-2 transition-transform" />
+          <button className="text-[10px] uppercase tracking-[0.3em] group flex items-center border-b border-black pb-2 hover:text-black/40 transition-all duration-500">
+            Tout lire <ArrowRight className="ml-3 w-3.5 h-3.5 group-hover:translate-x-2 transition-transform duration-500" />
           </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-16">
           {BLOG_POSTS.map((post, index) => (
             <motion.article 
               key={post.id}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: index * 0.2 }}
-              className="group"
+              transition={{ duration: 1, delay: index * 0.2 }}
+              className="group cursor-pointer"
             >
-              <div className="aspect-video overflow-hidden mb-6 relative">
+              <div className="aspect-[16/10] overflow-hidden mb-8 relative bg-black/5">
                 <img 
                   src={post.image} 
                   alt={post.title} 
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
                   referrerPolicy="no-referrer"
                 />
-                <div className="absolute top-4 left-4 bg-white/90 px-3 py-1 text-[10px] uppercase tracking-widest">
+                <div className="absolute top-6 left-6 bg-white/95 backdrop-blur-sm px-4 py-1.5 text-[9px] uppercase tracking-[0.3em] font-medium">
                   {post.category}
                 </div>
               </div>
-              <p className="text-[10px] text-black/40 uppercase tracking-widest mb-2">{post.date}</p>
-              <h3 className="text-xl font-serif mb-4 group-hover:text-black transition-colors">{post.title}</h3>
-              <button className="text-[10px] uppercase tracking-widest border-b border-black/20 pb-1 group-hover:border-black transition-colors">
-                Lire l'article
+              <p className="text-[9px] text-black/30 uppercase tracking-[0.3em] mb-3">{post.date}</p>
+              <h3 className="text-2xl font-serif mb-6 group-hover:text-black/60 transition-colors tracking-tight leading-snug">{post.title}</h3>
+              <button className="text-[10px] uppercase tracking-[0.3em] border-b border-black/10 pb-2 group-hover:border-black transition-all duration-500">
+                Explorer l'article
               </button>
             </motion.article>
           ))}
@@ -451,19 +545,121 @@ const Journal = () => {
 
 const Newsletter = () => {
   return (
-    <section id="newsletter" className="section-padding bg-black text-white border-t border-white/10">
-      <div className="max-w-3xl mx-auto text-center">
-        <span className="text-white/40 text-xs uppercase tracking-[0.3em] mb-4 block">Le Club Étoile</span>
-        <h2 className="text-4xl md:text-5xl font-serif mb-8 text-white">Rejoignez <span className="italic">l'Excellence</span></h2>
-        <p className="text-white/60 font-light leading-relaxed text-lg mb-12">
+    <section id="newsletter" className="section-padding bg-black text-black border-y border-black/5 relative overflow-hidden">
+      {/* Decorative background element */}
+      <div className="absolute inset-0 opacity-10 flex items-center justify-center pointer-events-none">
+        <span className="text-[20vw] font-serif italic text-black select-none whitespace-nowrap">Maison Étoile</span>
+      </div>
+
+      <div className="max-w-4xl mx-auto text-center relative z-10">
+        <span className="text-black/30 text-[10px] uppercase tracking-[0.6em] mb-8 block">Le Club Étoile</span>
+        <h2 className="text-6xl md:text-7xl font-serif mb-10 text-black leading-tight">Rejoignez <br /><span className="italic font-light">l'Excellence</span></h2>
+        <p className="text-black/50 font-light leading-relaxed text-xl mb-16 max-w-2xl mx-auto">
           Inscrivez-vous pour recevoir nos invitations exclusives, nos nouvelles collections et les coulisses de notre atelier.
         </p>
         <button 
           onClick={openKlaviyoForm}
-          className="px-12 py-4 bg-white text-black text-xs uppercase tracking-widest hover:bg-white/80 transition-all duration-500"
+          className="px-16 py-6 bg-white text-black text-[10px] uppercase tracking-[0.4em] hover:bg-black hover:text-white shadow-[0_20px_50px_-10px_rgba(0,0,0,0.1)] transition-all duration-700 ease-in-out"
         >
-          S'inscrire
+          S'inscrire au club
         </button>
+      </div>
+    </section>
+  );
+};
+
+const ReviewsSection = () => {
+  const [showForm, setShowForm] = useState(false);
+
+  return (
+    <section id="reviews" className="section-padding bg-white border-t border-black/5">
+      <div className="max-w-7xl mx-auto">
+        <div className="flex flex-col md:flex-row justify-between items-end mb-24 gap-8">
+          <div>
+            <span className="text-black/40 text-[10px] uppercase tracking-[0.5em] mb-6 block">Témoignages</span>
+            <h2 className="text-5xl md:text-6xl font-serif">Avis <span className="italic font-light">Clientèles</span></h2>
+          </div>
+          <button 
+            onClick={() => setShowForm(!showForm)}
+            className="text-[10px] uppercase tracking-[0.3em] group flex items-center border-b border-black pb-2 hover:text-black/40 hover:border-black/20 transition-all duration-500"
+          >
+            {showForm ? 'Annuler' : 'Laisser un avis'} <Plus className={`ml-3 w-3.5 h-3.5 transition-transform duration-500 ${showForm ? 'rotate-45' : ''}`} />
+          </button>
+        </div>
+
+        <AnimatePresence mode="wait">
+          {showForm && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="overflow-hidden mb-24"
+            >
+              <div className="bg-black/5 p-10 md:p-16 border border-black/5">
+                <h3 className="text-3xl font-serif mb-12 tracking-tight">Partagez votre expérience</h3>
+                <form className="grid grid-cols-1 lg:grid-cols-2 gap-12" onSubmit={(e) => e.preventDefault()}>
+                  <div className="space-y-8">
+                    <div className="space-y-4">
+                      <label className="text-[10px] uppercase tracking-[0.3em] text-black/40 block">Votre Nom d'Exception</label>
+                      <input type="text" className="w-full bg-white border-b border-black/10 px-0 py-4 focus:border-black outline-none transition-all duration-500" placeholder="Ex: Marie-Louise Chantal" />
+                    </div>
+                    <div className="space-y-4">
+                      <label className="text-[10px] uppercase tracking-[0.3em] text-black/40 block">Note de Satisfaction</label>
+                      <div className="flex space-x-3">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <button key={star} type="button" className="text-black/10 hover:text-black transition-colors duration-300">
+                            <Star className="w-6 h-6 fill-current" />
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="space-y-8">
+                    <div className="space-y-4">
+                      <label className="text-[10px] uppercase tracking-[0.3em] text-black/40 block">Votre Récit</label>
+                      <textarea rows={4} className="w-full bg-white border-b border-black/10 px-0 py-4 focus:border-black outline-none transition-all duration-500 resize-none" placeholder="Décrivez la magie de votre essayage..." />
+                    </div>
+                    <button className="w-full py-5 bg-black text-white text-[10px] uppercase tracking-[0.4em] hover:bg-black/80 transition-all duration-700 ease-in-out">
+                      Soumettre mon témoignage
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-16">
+          {REVIEWS.map((review, index) => (
+            <motion.div 
+              key={review.id}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 1, delay: index * 0.1 }}
+              className="border border-black/5 p-12 flex flex-col h-full bg-white transition-all duration-1000 hover:shadow-[0_50px_100px_-30px_rgba(0,0,0,0.08)] hover:-translate-y-2"
+            >
+              <div className="flex mb-10 space-x-1">
+                {[...Array(5)].map((_, i) => (
+                  <Star 
+                    key={i} 
+                    className={`w-3 h-3 ${i < review.rating ? 'text-black fill-current' : 'text-black/5'}`} 
+                  />
+                ))}
+              </div>
+              <p className="text-xl font-light leading-[1.8] italic text-black/60 mb-12 flex-grow tracking-tight">
+                "{review.content}"
+              </p>
+              <div className="border-t border-black/5 pt-10 flex justify-between items-center">
+                <div>
+                  <h4 className="font-serif text-xl tracking-tight mb-1">{review.name}</h4>
+                  <p className="text-[10px] uppercase tracking-[0.2em] text-black/30">Mariée d'Exception</p>
+                </div>
+                <span className="text-[10px] uppercase tracking-[0.2em] text-black/20 font-medium">{review.date}</span>
+              </div>
+            </motion.div>
+          ))}
+        </div>
       </div>
     </section>
   );
@@ -471,72 +667,78 @@ const Newsletter = () => {
 
 const Footer = () => {
   return (
-    <footer id="contact" className="bg-black text-white section-padding pb-12">
+    <footer id="contact" className="bg-white text-black section-padding pb-20 border-t border-black/5">
       <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-24 mb-24">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-32 mb-32">
           <div>
-            <h2 className="text-4xl md:text-5xl font-serif mb-12 text-white">Contactez <span className="italic">l'Atelier</span></h2>
-            <div className="space-y-8">
-              <div className="flex items-center space-x-6">
-                <Mail className="w-5 h-5 text-white" />
-                <p className="text-lg font-light">contact@maisonetoile.fr</p>
+            <h2 className="text-5xl md:text-6xl font-serif mb-16 text-black leading-tight">Nous <span className="italic font-light">Rencontrer.</span></h2>
+            <div className="space-y-12">
+              <div className="flex items-center space-x-8 group cursor-pointer">
+                <div className="w-12 h-12 border border-black/10 flex items-center justify-center group-hover:border-black transition-colors duration-500">
+                  <Mail className="w-4 h-4 text-black/60" />
+                </div>
+                <p className="text-xl font-light tracking-tight">atelier@maisonetoile.paris</p>
               </div>
-              <div className="flex items-center space-x-6">
-                <Phone className="w-5 h-5 text-white" />
-                <p className="text-lg font-light">+33 (0)1 42 65 00 00</p>
+              <div className="flex items-center space-x-8 group cursor-pointer">
+                <div className="w-12 h-12 border border-black/10 flex items-center justify-center group-hover:border-black transition-colors duration-500">
+                  <Phone className="w-4 h-4 text-black/60" />
+                </div>
+                <p className="text-xl font-light tracking-tight">+33 (0)1 42 65 00 00</p>
               </div>
-              <div className="flex items-center space-x-6">
-                <MapPin className="w-5 h-5 text-white" />
-                <p className="text-lg font-light">22 Rue du Faubourg Saint-Honoré, Paris</p>
+              <div className="flex items-center space-x-8 group cursor-pointer">
+                <div className="w-12 h-12 border border-black/10 flex items-center justify-center group-hover:border-black transition-colors duration-500">
+                  <MapPin className="w-4 h-4 text-black/60" />
+                </div>
+                <p className="text-xl font-light tracking-tight">22 Rue du Faubourg Saint-Honoré, VIIe</p>
               </div>
             </div>
 
-            <div className="mt-16">
-              <p className="text-xs uppercase tracking-[0.3em] text-white/60 mb-6">Suivez-nous</p>
-              <div className="flex space-x-8">
-                <a href="#" className="hover:text-white/60 transition-colors"><Instagram className="w-6 h-6" /></a>
-                <a href="#" className="hover:text-white/60 transition-colors font-serif italic text-xl">P</a>
-                <a href="#" className="hover:text-white/60 transition-colors font-serif italic text-xl">f</a>
+            <div className="mt-24">
+              <p className="text-[10px] uppercase tracking-[0.5em] text-black/30 mb-8 font-medium">L'Univers Numérique</p>
+              <div className="flex space-x-12">
+                <a href="#" className="text-black/40 hover:text-black transition-all duration-500 hover:-translate-y-1"><Instagram className="w-6 h-6" /></a>
+                <a href="#" className="text-black/40 hover:text-black transition-all duration-500 font-serif italic text-2xl hover:-translate-y-1 leading-none">P</a>
+                <a href="#" className="text-black/40 hover:text-black transition-all duration-500 font-serif italic text-2xl hover:-translate-y-1 leading-none">f</a>
               </div>
             </div>
           </div>
 
-          <form className="space-y-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="space-y-2">
-                <label className="text-[10px] uppercase tracking-widest text-white/40">Nom Complet</label>
-                <input type="text" className="w-full bg-transparent border-b border-white/20 py-2 focus:border-white outline-none transition-colors" />
+          <form className="space-y-12 bg-black/5 p-10 md:p-16 border border-black/5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+              <div className="space-y-4">
+                <label className="text-[10px] uppercase tracking-[0.3em] text-black/20 block">Votre Nom</label>
+                <input type="text" className="w-full bg-transparent border-b border-black/10 py-4 focus:border-black outline-none transition-all duration-700" />
               </div>
-              <div className="space-y-2">
-                <label className="text-[10px] uppercase tracking-widest text-white/40">Email</label>
-                <input type="email" className="w-full bg-transparent border-b border-white/20 py-2 focus:border-white outline-none transition-colors" />
+              <div className="space-y-4">
+                <label className="text-[10px] uppercase tracking-[0.3em] text-black/20 block">Votre Email</label>
+                <input type="email" className="w-full bg-transparent border-b border-black/10 py-4 focus:border-black outline-none transition-all duration-700" />
               </div>
             </div>
-            <div className="space-y-2">
-              <label className="text-[10px] uppercase tracking-widest text-white/40">Sujet</label>
-              <select className="w-full bg-transparent border-b border-white/20 py-2 focus:border-white outline-none transition-colors appearance-none cursor-pointer">
-                <option className="bg-black">Demande d'essayage</option>
-                <option className="bg-black">Création sur mesure</option>
-                <option className="bg-black">Presse & Partenariats</option>
+            <div className="space-y-4">
+              <label className="text-[10px] uppercase tracking-[0.3em] text-black/20 block">Nature de votre demande</label>
+              <select className="w-full bg-transparent border-b border-black/10 py-4 focus:border-black outline-none transition-all duration-700 appearance-none cursor-pointer text-black/60">
+                <option className="bg-white text-black/60">Demande d'essayage privé</option>
+                <option className="bg-white text-black/60">Création Haute Couture sur mesure</option>
+                <option className="bg-white text-black/60">Accompagnement presse</option>
               </select>
             </div>
-            <div className="space-y-2">
-              <label className="text-[10px] uppercase tracking-widest text-white/40">Message</label>
-              <textarea rows={4} className="w-full bg-transparent border-b border-white/20 py-2 focus:border-white outline-none transition-colors resize-none" />
+            <div className="space-y-4">
+              <label className="text-[10px] uppercase tracking-[0.3em] text-black/20 block">Votre Message</label>
+              <textarea rows={4} className="w-full bg-transparent border-b border-black/10 py-4 focus:border-black outline-none transition-all duration-700 resize-none" />
             </div>
-            <button className="px-12 py-4 bg-white text-black text-xs uppercase tracking-widest hover:bg-white/80 transition-all duration-500">
-              Envoyer le message
+            <button className="w-full py-6 bg-black text-white text-[10px] uppercase tracking-[0.4em] hover:bg-black/80 transition-all duration-700 ease-in-out shadow-[0_20px_50px_-20px_rgba(0,0,0,0.1)]">
+              Initier le contact
             </button>
           </form>
         </div>
 
-        <div className="pt-12 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-8">
-          <p className="text-[10px] uppercase tracking-widest text-white/30">
-            © 2026 Maison Étoile. Tous droits réservés.
+        <div className="pt-20 border-t border-black/5 flex flex-col md:flex-row justify-between items-center gap-12">
+          <p className="text-[9px] uppercase tracking-[0.4em] text-black/20 font-medium">
+            © 2026 Maison Étoile — Excellence Parisienne
           </p>
-          <div className="flex space-x-8">
-            <a href="#" className="text-[10px] uppercase tracking-widest text-white/30 hover:text-white transition-colors">Mentions Légales</a>
-            <a href="#" className="text-[10px] uppercase tracking-widest text-white/30 hover:text-white transition-colors">Politique de Confidentialité</a>
+          <div className="flex space-x-12">
+            <a href="#" className="text-[9px] uppercase tracking-[0.4em] text-black/20 hover:text-black transition-all duration-500">Mentions Légales</a>
+            <a href="#" className="text-[9px] uppercase tracking-[0.4em] text-black/20 hover:text-black transition-all duration-500">Confidentialité</a>
           </div>
         </div>
       </div>
@@ -563,6 +765,7 @@ export default function App() {
         items={SHOES} 
       />
       <Appointment />
+      <ReviewsSection />
       <Journal />
       <Newsletter />
       <Footer />
