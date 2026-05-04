@@ -6,7 +6,7 @@
 
 export const IMAGE_IDS = {
   // Hero Section
-  HERO_BG: "paradise.webphttps://drive.google.com/file/d/17VhWNVEnxA7fjPVwduxM-FK44U6ngGqT/view?usp=drive_link", // Replace with ID if on Drive
+  HERO_BG: "https://drive.google.com/file/d/17VhWNVEnxA7fjPVwduxM-FK44U6ngGqT/view?usp=drive_link", // Replace with ID if on Drive
 
   // Dresses Collection
   DRESS_AUDREY: "82255b362eaf01f4bc4747ca1309fd49.jpg",
