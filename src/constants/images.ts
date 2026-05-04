@@ -6,7 +6,7 @@
 
 export const IMAGE_IDS = {
   // Hero Section
-  HERO_BG: "17VhWNVEnxA7fjPVwduxM-FK44U6ngGqT",
+  HERO_BG: "https://drive.google.com/file/d/17VhWNVEnxA7fjPVwduxM-FK44U6ngGqT/view?usp=drive_link",
 
   // Dresses Collection
   DRESS_AUDREY: "1AN8fhANIfsTzFNF79534FID8vbL5r8SE",
