@@ -1,20 +1,31 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Maison Étoile | Haute Couture Nuptiale
 
-# Run and deploy your AI Studio app
+Une plateforme de prestige pour l'atelier de robes de mariée et chaussures Maison Étoile.
 
-This contains everything you need to run your app locally.
+## Déploiement
 
-View your app in AI Studio: https://ai.studio/apps/c1983b49-f388-488a-90c0-e1684c80621b
+### Vercel
+Ce projet est optimisé pour un déploiement sur [Vercel](https://vercel.com/).
+1. Importez votre dépôt GitHub sur Vercel.
+2. Vercel détectera automatiquement Vite et configurera les paramètres de build (`npm run build` et dossier `dist`).
+3. **Variables d'environnement** : Ajoutez `GEMINI_API_KEY` dans les paramètres du projet si vous utilisez des fonctionnalités IA.
 
-## Run Locally
+### GitHub Pages
+La configuration GitHub Actions est incluse dans `.github/workflows/deploy.yml`.
+1. Dans votre dépôt GitHub, allez dans **Settings > Pages**.
+2. Sous **Build and deployment > Source**, choisissez **GitHub Actions**.
+3. Poussez votre code sur la branche `main` pour déclencher le déploiement.
 
-**Prerequisites:**  Node.js
+## Images (Google Drive)
+Les images sont hébergées sur Google Drive. Pour garantir l'affichage :
+1. Assurez-vous que les fichiers sur Drive sont partagés en mode "Tous les utilisateurs disposant du lien".
+2. Utilisez les IDs ou les liens de partage dans `src/constants/images.ts`. L'application utilise un proxy (`lh3.googleusercontent.com`) pour contourner les limitations de hotlinking classiques.
 
+## Développement Local
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+```bash
+npm install
+npm run dev
+```
+
+L'application sera disponible sur `http://localhost:3000`.
