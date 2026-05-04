@@ -13,10 +13,10 @@ export const IMAGE_IDS = {
 
   // About Section
   ABOUT_MAIN: "https://drive.google.com/file/d/1HH7vMI7BdLZ5fLzN8xeAG6PF4MQ4xYI-/view?usp=drive_link",
-  ABOUT_DETAIL: "1AN8fhANIfsTzFNF79534FID8vbL5r8SE",
+  ABOUT_DETAIL: "https://drive.google.com/file/d/1AN8fhANIfsTzFNF79534FID8vbL5r8SE/view?usp=drive_link",
 
   // Blog Posts
-  BLOG_DRAPERY: "https://drive.google.com/file/d/1AN8fhANIfsTzFNF79534FID8vbL5r8SE/view?usp=drive_link",
+  BLOG_DRAPERY: "https://drive.google.com/file/d/1XC1YsN62uu9AE0TFL75G1LEbqJ-9w3D5/view?usp=drive_link",
   BLOG_CINEMA: "https://drive.google.com/file/d/1q-mKbDpHnRnNkrSvAUqhnp154H9U8yQL/view?usp=drive_link",
   BLOG_TRENDS: "https://drive.google.com/file/d/1q-mKbDpHnRnNkrSvAUqhnp154H9U8yQL/view?usp=drive_link",
 };
