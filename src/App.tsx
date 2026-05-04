@@ -48,13 +48,24 @@ interface Review {
 }
 
 // --- Constants & Helpers ---
-const getDriveImage = (idOrPath: string) => {
-  // If it's a long ID (Google Drive), return the direct link
-  if (idOrPath.length > 20 && !idOrPath.includes('/')) {
-    return `${GOOGLE_DRIVE_BASE_URL}${idOrPath}`;
+const getDriveImage = (idOrLink: string) => {
+  if (!idOrLink) return "";
+
+  // If it's a full Google Drive link, extract the ID
+  if (idOrLink.includes('drive.google.com')) {
+    const match = idOrLink.match(/\/d\/([a-zA-Z0-9_-]+)/);
+    if (match && match[1]) {
+      return `${GOOGLE_DRIVE_BASE_URL}${match[1]}`;
+    }
   }
+  
+  // If it's a long ID (Google Drive), return the direct link
+  if (idOrLink.length > 20 && !idOrLink.includes('/')) {
+    return `${GOOGLE_DRIVE_BASE_URL}${idOrLink}`;
+  }
+  
   // Fallback to local path or placeholder
-  return idOrPath;
+  return idOrLink;
 };
 
 // --- Data ---
@@ -545,21 +556,21 @@ const Journal = () => {
 
 const Newsletter = () => {
   return (
-    <section id="newsletter" className="section-padding bg-black text-black border-y border-black/5 relative overflow-hidden">
+    <section id="newsletter" className="section-padding bg-black text-white border-y border-white/5 relative overflow-hidden">
       {/* Decorative background element */}
       <div className="absolute inset-0 opacity-10 flex items-center justify-center pointer-events-none">
-        <span className="text-[20vw] font-serif italic text-black select-none whitespace-nowrap">Maison Étoile</span>
+        <span className="text-[20vw] font-serif italic text-white select-none whitespace-nowrap">Maison Étoile</span>
       </div>
 
       <div className="max-w-4xl mx-auto text-center relative z-10">
-        <span className="text-black/30 text-[10px] uppercase tracking-[0.6em] mb-8 block">Le Club Étoile</span>
-        <h2 className="text-6xl md:text-7xl font-serif mb-10 text-black leading-tight">Rejoignez <br /><span className="italic font-light">l'Excellence</span></h2>
-        <p className="text-black/50 font-light leading-relaxed text-xl mb-16 max-w-2xl mx-auto">
+        <span className="text-white/30 text-[10px] uppercase tracking-[0.6em] mb-8 block">Le Club Étoile</span>
+        <h2 className="text-6xl md:text-7xl font-serif mb-10 text-white leading-tight">Rejoignez <br /><span className="italic font-light">l'Excellence</span></h2>
+        <p className="text-white/50 font-light leading-relaxed text-xl mb-16 max-w-2xl mx-auto">
           Inscrivez-vous pour recevoir nos invitations exclusives, nos nouvelles collections et les coulisses de notre atelier.
         </p>
         <button 
           onClick={openKlaviyoForm}
-          className="px-16 py-6 bg-white text-black text-[10px] uppercase tracking-[0.4em] hover:bg-black hover:text-white shadow-[0_20px_50px_-10px_rgba(0,0,0,0.1)] transition-all duration-700 ease-in-out"
+          className="px-16 py-6 bg-white text-black text-[10px] uppercase tracking-[0.4em] hover:bg-white/90 shadow-[0_20px_50px_-10px_rgba(255,255,255,0.2)] transition-all duration-700 ease-in-out"
         >
           S'inscrire au club
         </button>
@@ -695,10 +706,18 @@ const Footer = () => {
 
             <div className="mt-24">
               <p className="text-[10px] uppercase tracking-[0.5em] text-black/30 mb-8 font-medium">L'Univers Numérique</p>
-              <div className="flex space-x-12">
-                <a href="#" className="text-black/40 hover:text-black transition-all duration-500 hover:-translate-y-1"><Instagram className="w-6 h-6" /></a>
-                <a href="#" className="text-black/40 hover:text-black transition-all duration-500 font-serif italic text-2xl hover:-translate-y-1 leading-none">P</a>
-                <a href="#" className="text-black/40 hover:text-black transition-all duration-500 font-serif italic text-2xl hover:-translate-y-1 leading-none">f</a>
+              <div className="flex flex-col space-y-6">
+                <div className="flex space-x-12">
+                  <a href="#" className="text-black/40 hover:text-black transition-all duration-500 hover:-translate-y-1"><Instagram className="w-6 h-6" /></a>
+                  <a href="#" className="text-black/40 hover:text-black transition-all duration-500 font-serif italic text-2xl hover:-translate-y-1 leading-none">P</a>
+                  <a href="#" className="text-black/40 hover:text-black transition-all duration-500 font-serif italic text-2xl hover:-translate-y-1 leading-none">f</a>
+                </div>
+                <button 
+                  onClick={openKlaviyoForm}
+                  className="text-[9px] uppercase tracking-[0.4em] text-black/40 hover:text-black transition-colors w-fit border-b border-black/5 pb-1"
+                >
+                  Rejoindre le Club Étoile
+                </button>
               </div>
             </div>
           </div>
