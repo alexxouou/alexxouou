@@ -51,20 +51,22 @@ interface Review {
 const getDriveImage = (idOrLink: string) => {
   if (!idOrLink) return "";
 
-  // If it's a full Google Drive link, extract the ID
+  // Extract ID from various formats (full URL, sharing link, or raw ID)
+  let id = idOrLink;
   if (idOrLink.includes('drive.google.com')) {
-    const match = idOrLink.match(/\/d\/([a-zA-Z0-9_-]+)/);
+    // Matches /d/ID/ or id=ID
+    const match = idOrLink.match(/\/d\/([a-zA-Z0-9_-]+)/) || idOrLink.match(/id=([a-zA-Z0-9_-]+)/);
     if (match && match[1]) {
-      return `${GOOGLE_DRIVE_BASE_URL}${match[1]}`;
+      id = match[1];
     }
   }
-  
-  // If it's a long ID (Google Drive), return the direct link
-  if (idOrLink.length > 20 && !idOrLink.includes('/')) {
-    return `${GOOGLE_DRIVE_BASE_URL}${idOrLink}`;
+
+  // If we have what looks like a Google Drive ID
+  if (id.length > 20 && !id.includes('/')) {
+    // This is the most reliable cross-platform direct link format
+    return `https://docs.google.com/uc?export=view&id=${id}`;
   }
   
-  // Fallback to local path or placeholder
   return idOrLink;
 };
 
