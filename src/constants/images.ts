@@ -9,22 +9,22 @@ export const IMAGE_IDS = {
   HERO_BG: "https://drive.google.com/file/d/17VhWNVEnxA7fjPVwduxM-FK44U6ngGqT/view?usp=drive_link",
 
   // Dresses Collection
-  DRESS_AUDREY: "1AN8fhANIfsTzFNF79534FID8vbL5r8SE",
-  DRESS_GRACE: "1q3oabhz6Y0Ak2Obm2bWNGIJX1NLtfEgk",
-  DRESS_MARILYN: "1AN8fhANIfsTzFNF79534FID8vbL5r8SE",
+  DRESS_AUDREY: "https://drive.google.com/file/d/1XC1YsN62uu9AE0TFL75G1LEbqJ-9w3D5/view?usp=drive_link",
+  DRESS_GRACE: "https://drive.google.com/file/d/1q3oabhz6Y0Ak2Obm2bWNGIJX1NLtfEgk/view?usp=drive_link",
+  DRESS_MARILYN: "https://drive.google.com/file/d/1q-mKbDpHnRnNkrSvAUqhnp154H9U8yQL/view?usp=drive_link",
 
   // Shoes Collection
-  SHOE_CINDERELLA: "1rXxePhrKbmUQD6_ZzE_U-Pfc3c0TKSAh",
-  SHOE_HOLLYWOOD: "1tLa69v0kgTm7Bqk1hGCBuJ--tNyFNegw",
+  SHOE_CINDERELLA: "https://drive.google.com/file/d/1tLa69v0kgTm7Bqk1hGCBuJ--tNyFNegw/view?usp=drive_link",
+  SHOE_HOLLYWOOD: "https://drive.google.com/file/d/1rXxePhrKbmUQD6_ZzE_U-Pfc3c0TKSAh/view?usp=drive_link",
 
   // About Section
-  ABOUT_MAIN: "1uMtxSHSJSCQj2DLKSa2yQlVzjMrCXiL2",
+  ABOUT_MAIN: "https://drive.google.com/file/d/1HH7vMI7BdLZ5fLzN8xeAG6PF4MQ4xYI-/view?usp=drive_link",
   ABOUT_DETAIL: "1AN8fhANIfsTzFNF79534FID8vbL5r8SE",
 
   // Blog Posts
-  BLOG_DRAPERY: "1q3oabhz6Y0Ak2Obm2bWNGIJX1NLtfEgk",
-  BLOG_CINEMA: "1uMtxSHSJSCQj2DLKSa2yQlVzjMrCXiL2",
-  BLOG_TRENDS: "1q-mKbDpHnRnNkrSvAUqhnp154H9U8yQL",
+  BLOG_DRAPERY: "https://drive.google.com/file/d/1AN8fhANIfsTzFNF79534FID8vbL5r8SE/view?usp=drive_link",
+  BLOG_CINEMA: "https://drive.google.com/file/d/1q-mKbDpHnRnNkrSvAUqhnp154H9U8yQL/view?usp=drive_link",
+  BLOG_TRENDS: "https://drive.google.com/file/d/1q-mKbDpHnRnNkrSvAUqhnp154H9U8yQL/view?usp=drive_link",
 };
 
 export const GOOGLE_DRIVE_BASE_URL = "https://lh3.googleusercontent.com/d/";
