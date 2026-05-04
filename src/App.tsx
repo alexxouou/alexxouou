@@ -53,18 +53,20 @@ const getDriveImage = (idOrLink: string) => {
 
   let id = idOrLink;
   
-  // Extract ID from full URL or sharing link
+  // Robust extraction of ID from any Google Drive link format
   if (idOrLink.includes('drive.google.com')) {
-    // Look for /d/ID or id=ID
-    const match = idOrLink.match(/\/d\/([a-zA-Z0-9_-]+)/) || idOrLink.match(/id=([a-zA-Z0-9_-]+)/);
-    if (match && match[1]) {
-      id = match[1];
+    const idMatch = idOrLink.match(/\/d\/([a-zA-Z0-9_-]{25,})/) || 
+                    idOrLink.match(/id=([a-zA-Z0-9_-]{25,})/) ||
+                    idOrLink.match(/\/file\/d\/([a-zA-Z0-9_-]{25,})/);
+    
+    if (idMatch && idMatch[1]) {
+      id = idMatch[1];
     }
   }
 
-  // If it's a long string without slashes, it's likely a Google Drive ID
-  if (id.length > 20 && !id.includes('/')) {
-    // The googleusercontent proxy is the most reliable for bypass/direct hotlinking
+  // If we have a valid-looking Google Drive ID
+  if (id.length >= 25 && !id.includes('/') && !id.includes('.')) {
+    // Both variants are popular, lh3 is usually better for scaling/quality
     return `https://lh3.googleusercontent.com/d/${id}`;
   }
   
@@ -238,7 +240,6 @@ const Hero = () => {
           src={getDriveImage(IMAGE_IDS.HERO_BG)} 
           alt="Maison Étoile Wedding Dress" 
           className="w-full h-full object-cover object-[center_35%]"
-          referrerPolicy="no-referrer"
         />
         <div className="absolute inset-0 bg-white/40" />
       </motion.div>
@@ -320,7 +321,6 @@ const About = () => {
               src={getDriveImage(IMAGE_IDS.ABOUT_MAIN)} 
               alt="Atelier Maison Étoile Wedding Dress" 
               className="w-full h-full object-cover"
-              referrerPolicy="no-referrer"
             />
           </motion.div>
           <motion.div style={{ y: y2 }} className="absolute -bottom-12 -right-12 w-64 h-80 hidden md:block border-8 border-white overflow-hidden shadow-2xl">
@@ -328,7 +328,6 @@ const About = () => {
               src={getDriveImage(IMAGE_IDS.ABOUT_DETAIL)} 
               alt="Détails dentelle dorée" 
               className="w-full h-full object-cover"
-              referrerPolicy="no-referrer"
             />
           </motion.div>
         </motion.div>
@@ -394,7 +393,6 @@ const CollectionSection = ({ title, subtitle, items, id }: { title: string, subt
                   src={item.image} 
                   alt={item.title} 
                   className="w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105"
-                  referrerPolicy="no-referrer"
                 />
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-700" />
                 <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-700">
@@ -538,7 +536,6 @@ const Journal = () => {
                   src={post.image} 
                   alt={post.title} 
                   className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
-                  referrerPolicy="no-referrer"
                 />
                 <div className="absolute top-6 left-6 bg-white/95 backdrop-blur-sm px-4 py-1.5 text-[9px] uppercase tracking-[0.3em] font-medium">
                   {post.category}
