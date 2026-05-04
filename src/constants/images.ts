@@ -1,36 +1,36 @@
 export const IMAGE_IDS = {
   // Hero Section
-  HERO_BG: "17VhWNVEnxA7fjPVwduxM-FK44U6ngGqT",
+  HERO_BG: "https://drive.google.com/file/d/17VhWNVEnxA7fjPVwduxM-FK44U6ngGqT/view?usp=drive_link",
 
   // Dresses Collection
-  DRESS_AUDREY: "1XC1YsN62uu9AE0TFL75G1LEbqJ-9w3D5",
-  DRESS_GRACE: "1q3oabhz6Y0Ak2Obm2bWNGIJX1NLtfEgk",
-  DRESS_MARILYN: "1q-mKbDpHnRnNkrSvAUqhnp154H9U8yQL",
+  DRESS_AUDREY: "https://drive.google.com/file/d/1XC1YsN62uu9AE0TFL75G1LEbqJ-9w3D5/view?usp=drive_link",
+  DRESS_GRACE: "https://drive.google.com/file/d/1q3oabhz6Y0Ak2Obm2bWNGIJX1NLtfEgk/view?usp=drive_link",
+  DRESS_MARILYN: "https://drive.google.com/file/d/1q-mKbDpHnRnNkrSvAUqhnp154H9U8yQL/view?usp=drive_link",
 
   // Shoes Collection
-  SHOE_CINDERELLA: "1tLa69v0kgTm7Bqk1hGCBuJ--tNyFNegw",
-  SHOE_HOLLYWOOD: "1rXxePhrKbmUQD6_ZzE_U-Pfc3c0TKSAh",
+  SHOE_CINDERELLA: "https://drive.google.com/file/d/1tLa69v0kgTm7Bqk1hGCBuJ--tNyFNegw/view?usp=drive_link",
+  SHOE_HOLLYWOOD: "https://drive.google.com/file/d/1rXxePhrKbmUQD6_ZzE_U-Pfc3c0TKSAh/view?usp=drive_link",
 
   // About Section
-  ABOUT_MAIN: "1HH7vMI7BdLZ5fLzN8xeAG6PF4MQ4xYI-",
+  ABOUT_MAIN: "https://drive.google.com/file/d/1HH7vMI7BdLZ5fLzN8xeAG6PF4MQ4xYI-/view?usp=drive_link",
   ABOUT_DETAIL: "1AN8fhANIfsTzFNF79534FID8vbL5r8SE",
 
   // Blog Posts
-  BLOG_DRAPERY: "1AN8fhANIfsTzFNF79534FID8vbL5r8SE",
-  BLOG_CINEMA: "1q-mKbDpHnRnNkrSvAUqhnp154H9U8yQL",
-  BLOG_TRENDS: "1q-mKbDpHnRnNkrSvAUqhnp154H9U8yQL",
+  BLOG_DRAPERY: "https://drive.google.com/file/d/1AN8fhANIfsTzFNF79534FID8vbL5r8SE/view?usp=drive_link",
+  BLOG_CINEMA: "https://drive.google.com/file/d/1q-mKbDpHnRnNkrSvAUqhnp154H9U8yQL/view?usp=drive_link",
+  BLOG_TRENDS: "https://drive.google.com/file/d/1q-mKbDpHnRnNkrSvAUqhnp154H9U8yQL/view?usp=drive_link",
 };
+
+export const GOOGLE_DRIVE_BASE_URL = "https://lh3.googleusercontent.com/d/";
 
 export const getDriveImage = (idOrLink: string) => {
   if (!idOrLink) return "";
 
-  // Si c'est déjà une URL directe, on la retourne
-  if (idOrLink.includes('lh3.googleusercontent.com')) return idOrLink;
-
   let id = idOrLink;
   
-  // Extraction de l'ID si c'est un lien de partage classique
+  // Robust extraction of ID from any Google Drive link format
   if (idOrLink.includes('drive.google.com')) {
+    // Matches /d/ID, /file/d/ID, or id=ID
     const idMatch = idOrLink.match(/\/d\/([a-zA-Z0-9_-]{25,})/) || 
                     idOrLink.match(/id=([a-zA-Z0-9_-]{25,})/);
     
@@ -39,8 +39,10 @@ export const getDriveImage = (idOrLink: string) => {
     }
   }
 
-  // Formatage final en URL directe haute fiabilité
+  // Si l'ID semble valide (chaîne longue sans slash)
   if (id.length >= 25 && !id.includes('/')) {
+    // lh3.googleusercontent.com est très fiable pour l'affichage direct
+    // alternativement on peut utiliser https://docs.google.com/uc?export=view&id=${id}
     return `https://lh3.googleusercontent.com/d/${id}`;
   }
   
