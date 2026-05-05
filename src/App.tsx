@@ -150,7 +150,7 @@ const Navbar = () => {
 
   return (
     <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${isScrolled ? 'bg-white/95 backdrop-blur-md py-4 shadow-sm' : 'bg-transparent py-8'}`}>
-      <div className="max-w-[1600px] mx-auto pl-8 md:pl-16 pr-6 md:pr-10 flex justify-between items-center">
+      <div className="max-w-[1700px] mx-auto pl-8 md:pl-16 pr-4 md:pr-6 flex justify-between items-center">
         <a href="#home" className="text-xl md:text-2xl font-serif tracking-[0.4em] uppercase text-black shrink-0 transition-transform hover:scale-[1.02]">
           Maison <span className="italic font-light">Étoile</span>
         </a>
