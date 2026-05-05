@@ -26,5 +26,3 @@ export const IMAGE_IDS = {
   BLOG_CINEMA: "1uMtxSHSJSCQj2DLKSa2yQlVzjMrCXiL2",
   BLOG_TRENDS: "1q-mKbDpHnRnNkrSvAUqhnp154H9U8yQL",
 };
-
-export const GOOGLE_DRIVE_BASE_URL = "https://lh3.googleusercontent.com/d/";

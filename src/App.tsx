@@ -19,7 +19,7 @@ import {
   Star,
   Plus
 } from 'lucide-react';
-import { IMAGE_IDS, GOOGLE_DRIVE_BASE_URL } from './constants/images';
+import { IMAGE_IDS } from './constants/images';
 
 // --- Types ---
 interface CollectionItem {
@@ -51,6 +51,9 @@ interface Review {
 const getDriveImage = (idOrLink: string) => {
   if (!idOrLink) return "";
 
+  // If it's already a direct googleusercontent link, return it
+  if (idOrLink.includes('googleusercontent.com')) return idOrLink;
+
   let id = idOrLink;
   
   // Extract ID from full URL or sharing link
@@ -64,8 +67,9 @@ const getDriveImage = (idOrLink: string) => {
 
   // If it's a long string without slashes, it's likely a Google Drive ID
   if (id.length > 20 && !id.includes('/')) {
-    // The googleusercontent proxy is the most reliable for bypass/direct hotlinking
-    return `https://lh3.googleusercontent.com/d/${id}`;
+    // Using the googleusercontent proxy which is most reliable for direct hotlinking
+    // Added =s2000 to ensure high quality (avoids low-res thumbnails)
+    return `https://lh3.googleusercontent.com/d/${id}=s2000`;
   }
   
   return idOrLink;
