@@ -140,8 +140,9 @@ const Navbar = () => {
     { label: 'Accueil', href: '#home' },
     { label: 'Robes', href: '#dresses' },
     { label: 'Chaussures', href: '#shoes' },
+    { label: 'Guide', href: '#guide' },
+    { label: 'FAQ', href: '#faq' },
     { label: 'Rendez-vous', href: '#appointment' },
-    { label: 'Avis', href: '#reviews' },
     { label: 'Contact', href: '#contact' },
   ];
 
@@ -149,12 +150,12 @@ const Navbar = () => {
 
   return (
     <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${isScrolled ? 'bg-white/95 backdrop-blur-md py-4 shadow-sm' : 'bg-transparent py-8'}`}>
-      <div className="max-w-[1600px] mx-auto px-8 md:px-16 flex justify-between items-center">
+      <div className="max-w-[1600px] mx-auto pl-8 md:pl-16 pr-6 md:pr-10 flex justify-between items-center">
         <a href="#home" className="text-xl md:text-2xl font-serif tracking-[0.4em] uppercase text-black shrink-0 transition-transform hover:scale-[1.02]">
           Maison <span className="italic font-light">Étoile</span>
         </a>
 
-        <div className="hidden lg:flex items-center space-x-20">
+        <div className="hidden lg:flex items-center space-x-16">
           <div className="flex items-center space-x-12">
             {navItems.map((item) => (
               <a key={item.label} href={item.href} className="nav-link font-medium">
@@ -370,10 +371,13 @@ const About = () => {
           <div className="luxury-line"></div>
           <div className="space-y-8 text-black/60 font-light leading-relaxed text-lg lg:pr-12">
             <p>
-              Maison Étoile est née d'une passion dévorante pour l'âge d'or du cinéma et la virtuosité de la haute couture nuptiale. Chaque création est un hommage aux silhouettes qui ont marqué l'histoire, de la sophistication d'Audrey Hepburn à la sensualité de Marilyn Monroe.
+              Maison Étoile est née d'une vision céleste : habiller les rêves de poussière d'étoiles. Notre inspiration puise sa source dans l'envoûtement des nuits parisiennes et la magie intemporelle du septième art. Pourquoi existons-nous ? Pour faire de chaque mariée une icône éternelle.
             </p>
             <p>
-              Dans notre atelier parisien, le temps semble s'arrêter. Nos artisans façonnent chaque robe à la main, utilisant des soies lyonnaises et des dentelles de Calais pour que chaque mariée se sente l'héroïne de son propre film.
+              Nos valeurs reposent sur un triptyque sacré : <strong>Excellence</strong> de la coupe, <strong>Intemporalité</strong> du style et <strong>Émotion</strong> du premier regard. Chaque pièce raconte une histoire, la vôtre, sublimée par notre savoir-faire unique.
+            </p>
+            <p>
+              Dans notre atelier parisien, la fabrication est un rituel. Nos artisans façonnent chaque robe à la main, point par point, utilisant des soies lyonnaises et des dentelles de Calais. Ici, le luxe n'est pas un vain mot, c'est une promesse de perfection artisanale.
             </p>
           </div>
           <div className="mt-16 pt-12 border-t border-black/5 flex items-center space-x-12">
@@ -527,6 +531,153 @@ const Appointment = () => {
             * Un acompte est requis pour valider votre créneau.
           </p>
         </motion.div>
+      </div>
+    </section>
+  );
+};
+
+const FAQ = () => {
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+
+  const items = [
+    { q: "Délais de livraison", a: "Nos créations sur mesure nécessitent généralement 4 à 6 mois de confection. Pour les modèles de collection, comptez 8 à 12 semaines selon la saisonnalité." },
+    { q: "Retouches", a: "Deux séances de retouches personnalisées sont systématiquement incluses dans notre atelier parisien pour garantir un tomber irréprochable." },
+    { q: "Tailles", a: "Nous proposons un vestiaire du 34 au 48. Au-delà, notre service de demi-mesure ou sur mesure total prend le relais pour sublimer chaque silhouette." },
+    { q: "Remboursement", a: "S'agissant de pièces uniques réalisées à la commande, nous n'acceptons pas les retours. Un acompte de 50% est requis pour initier la création." },
+    { q: "Entretien", a: "Nous recommandons exclusivement un nettoyage à sec spécialisé haute couture. Un guide complet d'entretien accompagne chaque pièce." },
+    { q: "Accessoires", a: "Voiles en dentelle de Chantilly, gants de soie et bijoux de tête artisanaux sont disponibles pour parfaire votre allure Étoile." },
+    { q: "Commande sur mesure", a: "Le processus débute par un entretien créatif avec notre directrice artistique. Nous dessinons ensemble le croquis original de votre robe unique." },
+  ];
+
+  return (
+    <section id="faq" className="section-padding bg-white border-t border-black/5">
+      <div className="max-w-4xl mx-auto">
+        <div className="text-center mb-24">
+          <span className="text-black/40 text-[10px] uppercase tracking-[0.5em] mb-6 block">Vos Questions</span>
+          <h2 className="text-5xl md:text-6xl font-serif">Questions <span className="italic font-light">Fréquentes</span></h2>
+        </div>
+        
+        <div className="space-y-6">
+          {items.map((item, i) => (
+            <div key={i} className="border-b border-black/5">
+              <button 
+                onClick={() => setOpenIndex(openIndex === i ? null : i)}
+                className="w-full py-8 flex justify-between items-center text-left group"
+              >
+                <span className="text-xl font-serif tracking-tight group-hover:text-black/60 transition-colors">{item.q}</span>
+                <Plus className={`w-4 h-4 transition-transform duration-500 ${openIndex === i ? 'rotate-45' : ''}`} />
+              </button>
+              <AnimatePresence>
+                {openIndex === i && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    className="overflow-hidden"
+                  >
+                    <p className="pb-8 text-black/60 font-light leading-relaxed text-lg italic">
+                      {item.a}
+                    </p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+const SizeGuide = () => {
+  return (
+    <section id="guide" className="section-padding bg-black/2 pb-32">
+      <div className="max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-24 items-center mb-24">
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+          >
+            <span className="text-black/40 text-[10px] uppercase tracking-[0.4em] mb-6 block">Précision & Harmonie</span>
+            <h2 className="text-5xl md:text-6xl font-serif mb-10 leading-tight">Le Guide <br /><span className="italic font-light">des mesures.</span></h2>
+            <p className="text-black/60 font-light leading-relaxed text-lg mb-12">
+              Pour une robe qui épouse vos courbes comme une seconde peau, la précision est notre maître-mot. Suivez notre protocole de mesure pour identifier votre taille idéale.
+            </p>
+            
+            <div className="space-y-8">
+              {[
+                { l: "Poitrine", d: "Mesurez à l'endroit le plus fort, sans serrer, en gardant le mètre bien horizontal." },
+                { l: "Taille", d: "Mesurez au creux de votre taille naturelle, généralement au-dessus du nombril." },
+                { l: "Hanches", d: "Mesurez à l'endroit le plus large du bassin, pieds joints." }
+              ].map((m, i) => (
+                <div key={i} className="flex gap-6 group">
+                  <div className="w-10 h-10 border border-black/10 flex items-center justify-center flex-shrink-0 text-xs font-serif italic text-black group-hover:bg-black group-hover:text-white transition-all">0{i+1}</div>
+                  <div>
+                    <h4 className="font-serif text-lg mb-1">{m.l}</h4>
+                    <p className="text-sm text-black/40 font-light">{m.d}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            className="aspect-video bg-black/5 flex flex-col items-center justify-center relative group overflow-hidden border border-black/5"
+          >
+            {/* Simulation d'une vidéo explicative */}
+            <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors" />
+            <div className="w-20 h-20 rounded-full border border-black/20 flex items-center justify-center relative z-10 group-hover:scale-110 transition-transform">
+              <ChevronRight className="w-8 h-8 text-black" />
+            </div>
+            <p className="mt-6 text-[10px] uppercase tracking-[0.4em] relative z-10">Vidéo Explicative</p>
+            <div className="absolute bottom-6 right-6 text-[8px] uppercase tracking-[0.2em] opacity-40">Atelier Place Vendôme</div>
+          </motion.div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
+          <div className="bg-white p-12 border border-black/5">
+            <h3 className="font-serif text-2xl mb-8 tracking-tight italic">Comparaison Internationale</h3>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm">
+                <thead>
+                  <tr className="border-b border-black/5 text-[9px] uppercase tracking-widest text-black/40">
+                    <th className="py-4">FR</th>
+                    <th className="py-4">UK</th>
+                    <th className="py-4">US</th>
+                    <th className="py-4">IT</th>
+                  </tr>
+                </thead>
+                <tbody className="font-light">
+                  {[[34, 6, 2, 38], [36, 8, 4, 40], [38, 10, 6, 42], [40, 12, 8, 44]].map((row, i) => (
+                    <tr key={i} className="border-b border-black/5">
+                       {row.map((cell, j) => <td key={j} className="py-4">{cell}</td>)}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div className="bg-white p-12 border border-black/5">
+            <h3 className="font-serif text-2xl mb-8 tracking-tight italic">Conseils Morphologie</h3>
+            <div className="space-y-8">
+              {[
+                { t: "Silhouette Sablier", a: "Les coupes sirènes et les tailles marquées subliment votre équilibre naturel." },
+                { t: "Silhouette en A", a: "Privilégiez les bustiers travaillés pour porter l'attention sur le haut du corps." },
+                { t: "Silhouette en H", a: "Les volumes fluides et les jeux de transparence créent du mouvement et de la douceur." }
+              ].map((c, i) => (
+                <div key={i}>
+                  <p className="text-[10px] uppercase tracking-[0.2em] text-black/40 mb-2">{c.t}</p>
+                  <p className="text-black/70 font-light leading-relaxed">{c.a}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );
@@ -812,6 +963,8 @@ export default function App() {
       <Appointment />
       <ReviewsSection />
       <Journal />
+      <SizeGuide />
+      <FAQ />
       <Newsletter />
       <Footer />
     </main>
